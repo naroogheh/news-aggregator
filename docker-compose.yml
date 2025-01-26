@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  #  PHP &  Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: news-aggregator-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    networks:
+      - news-aggregator-network
+
+  #  Nginx
+  webserver:
+    image: nginx:alpine
+    container_name: news-aggregator-webserver
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d
+    networks:
+      - news-aggregator-network
+    depends_on:
+      - app
+
+  #  MySQL
+  db:
+    image: mysql:8.0
+    container_name: news-aggregator-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: news_aggregator
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_PASSWORD: secret
+      MYSQL_USER: laravel
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - news-aggregator-network
+
+  #  Redis
+  redis:
+    image: redis:alpine
+    container_name: news-aggregator-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - news-aggregator-network
+
+  #  Queue Worker
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: news-aggregator-worker
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    command: php artisan queue:work
+    networks:
+      - news-aggregator-network
+    depends_on:
+      - app
+      - redis
+
+# شبکه‌های Docker
+networks:
+  news-aggregator-network:
+    driver: bridge
+
+# Volumeها برای ذخیره‌سازی داده‌های پایدار
+volumes:
+  dbdata:
+    driver: local
+  redisdata:
+    driver: local
