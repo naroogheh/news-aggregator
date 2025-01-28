@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('title')->nullable();
             $table->string('base_url')->nullable();
+            $table->string('reader_class')->nullable();
             $table->string('api_token')->nullable();
+            $table->DateTime('last_sync_time')->nullable();
             $table->integer('status')->default(1);
             $table->timestamps();
         });

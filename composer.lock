@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "626b9e7ddd47fb7eff9aaa53cce0c9ad",
+    "content-hash": "3062f050c9188922879e9c2ba37b1cf8",
     "packages": [
         {
             "name": "brick/math",
@@ -2420,6 +2420,62 @@
                 "source": "https://github.com/nikic/PHP-Parser/tree/v5.4.0"
             },
             "time": "2024-12-30T11:07:19+00:00"
+        },
+        {
+            "name": "nonsoniyi/the-guardian-api-client",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/niyiomotoso/the-guardian-api-php-client.git",
+                "reference": "0ed9a81f4ad7734e453088267225806a8d319b70"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/niyiomotoso/the-guardian-api-php-client/zipball/0ed9a81f4ad7734e453088267225806a8d319b70",
+                "reference": "0ed9a81f4ad7734e453088267225806a8d319b70",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Guardian\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nonso Mgbechi",
+                    "email": "mgbechinonso@gmail.com",
+                    "homepage": "https://kingdageek.github.io"
+                },
+                {
+                    "name": "Omoniyi Omotoso",
+                    "email": "omoniyiomotoso@gmail.com",
+                    "homepage": "https://niyiomotoso.github.io"
+                }
+            ],
+            "description": "PHP wrapper for the guardian APIs",
+            "homepage": "https://github.com/niyiomotoso/the-guardian-api-php-client",
+            "keywords": [
+                "The Guardian",
+                "api",
+                "wrapper"
+            ],
+            "support": {
+                "issues": "https://github.com/niyiomotoso/the-guardian-api-php-client/issues",
+                "source": "https://github.com/niyiomotoso/the-guardian-api-php-client/tree/v1.0.4"
+            },
+            "time": "2024-05-14T21:04:44+00:00"
         },
         {
             "name": "nunomaduro/termwind",

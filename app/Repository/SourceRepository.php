@@ -8,36 +8,32 @@ use App\Repository\Interfaces\SourceRepositoryInterface;
 
 class SourceRepository implements SourceRepositoryInterface
 {
-    private $model;
 
-    function __construct(Source $model)
-    {
-        $this->model = $model;
-    }
+
 
     function insertItem($params)
     {
-        $this->model->create($params);
+        Source::create($params);
     }
 
     public function getAll()
     {
-        return $this->model->where('status', Status::Active->value)->get();
+        return Source::where('status', Status::Active->value)->get();
     }
 
     public function getById($id)
     {
-        return $this->model->find($id);
+        return Source::find($id);
     }
 
     public function changeStatus(int $id, int $status)
     {
-        $find = $this->model->find($id);
+        $find = Source::find($id);
         if (!$find) {
             return false;
         }
 
-        $this->model->where('id', $id)->update(
+        Source::where('id', $id)->update(
             [
                 'status' => $status
             ]
