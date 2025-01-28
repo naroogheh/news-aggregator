@@ -1,86 +1,73 @@
-version: '3.8'
-
 services:
-  #  PHP &  Laravel
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: news-aggregator-app
-    restart: unless-stopped
-    working_dir: /var/www
-    volumes:
-      - .:/var/www
-    networks:
-      - news-aggregator-network
 
-  #  Nginx
-  webserver:
-    image: nginx:alpine
-    container_name: news-aggregator-webserver
-    restart: unless-stopped
+  ####################################################################################################
+  # PHP
+  ####################################################################################################
+  php:
+    build: .docker/php
+    container_name: news_php
+    volumes:
+      - .:/var/www:cached
+
+  ####################################################################################################
+  # Nginx
+  ####################################################################################################
+  nginx:
+    image: nginx
     ports:
-      - "8080:80"
+      - 2080:80
     volumes:
       - .:/var/www
-      - ./docker/nginx:/etc/nginx/conf.d
-    networks:
-      - news-aggregator-network
+      - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-      - app
+      - php
 
-  #  MySQL
+  ####################################################################################################
+  # DATABASE (MySQL)
+  ####################################################################################################
   db:
-    image: mysql:8.0
-    container_name: news-aggregator-db
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: news_aggregator
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_PASSWORD: secret
-      MYSQL_USER: laravel
-    volumes:
-      - dbdata:/var/lib/mysql
-    networks:
-      - news-aggregator-network
-
-  #  Redis
-  redis:
-    image: redis:alpine
-    container_name: news-aggregator-redis
-    restart: unless-stopped
+    image: mysql:8.1
+    container_name: news_mysql
     ports:
-      - "6379:6379"
+      - 3307:3306
     volumes:
-      - redisdata:/data
-    networks:
-      - news-aggregator-network
+      - .docker/db/data:/var/lib/mysql
+      - .docker/logs:/var/log/mysql
+      - .docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - .docker/db/sql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: news
+      MYSQL_USER: news
+      MYSQL_PASSWORD: news
 
-  #  Queue Worker
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: news-aggregator-worker
-    restart: unless-stopped
-    working_dir: /var/www
+  ####################################################################################################
+  # phpMyAdmin
+  ####################################################################################################
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: news_phpmyadmin
+    ports:
+      - 8081:80
+    links:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
     volumes:
-      - .:/var/www
-    command: php artisan queue:work
-    networks:
-      - news-aggregator-network
-    depends_on:
-      - app
-      - redis
+      - .docker/phpmyadmin/sessions:/sessions
 
-# شبکه‌های Docker
-networks:
-  news-aggregator-network:
-    driver: bridge
+  ####################################################################################################
+  # Redis
+  ####################################################################################################
+  redis:
+    image: redis:latest
+    command: redis-server --appendonly yes
+    volumes:
+      - .docker/redis/data:/data
+    ports:
+      - 6380:6379
 
-# Volumeها برای ذخیره‌سازی داده‌های پایدار
-volumes:
-  dbdata:
-    driver: local
-  redisdata:
-    driver: local
+

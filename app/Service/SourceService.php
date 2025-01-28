@@ -8,9 +8,15 @@ class SourceService
 {
     private $sourceRepository;
 
+
     function __construct(SourceRepositoryInterface $sourceRepository)
     {
         $this->sourceRepository = $sourceRepository;
+    }
+
+    function insertItem($params)
+    {
+        return $this->sourceRepository->insertItem($params);
     }
 
     public function getAll()
