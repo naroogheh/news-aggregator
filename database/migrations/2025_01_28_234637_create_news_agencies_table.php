@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\NewsAgency;
-use App\Models\Source;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('news', function (Blueprint $table) {
+        Schema::create('news_agencies', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
-            $table->foreignIdFor(Source::class);
-            $table->foreignIdFor(NewsAgency::class);
-            $table->string('unique_id_on_source')->nullable();
-            $table->string('web_url_on_source')->nullable();
-            $table->string('description')->nullable();
-
+            $table->string('slug')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('news');
+        Schema::dropIfExists('news_agencies');
     }
 };

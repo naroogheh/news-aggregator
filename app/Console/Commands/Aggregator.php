@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ArticlesSaverJob;
 use App\Service\SourceService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class Aggregator extends Command
 {
@@ -37,11 +39,21 @@ class Aggregator extends Command
             try {
                 $params = $this->getParams($source);
                 $class_name = "App\Service\Readers\\".$source->reader_class;
+                if (!class_exists($class_name)) {
+                    throw new \Exception("Class {$class_name} does not exist.");
+                }
                 $class = new $class_name($source);
-                $class->getArticles($params);
+                $articles = $class->getArticles($params);
+                if (!empty($articles)) {
+                    ArticlesSaverJob::dispatch($articles);
+                }
             }
             catch (\Exception $e) {
-                dd($e->getMessage());
+                Log::error("Error processing source on Aggregator : {$source->id}", [
+                    'message' => $e->getMessage(),
+                    'source' => $source,
+                    'trace' => $e->getTraceAsString(),
+                ]);
             }
         }
     }
