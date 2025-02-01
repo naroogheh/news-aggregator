@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\News;
+use App\Service\NewsService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -13,7 +14,9 @@ class ArticlesSaverJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $newsData;
+
+    protected $newsData,$newsService;
+
 
     /**
      * Create a new job instance.
@@ -23,6 +26,7 @@ class ArticlesSaverJob implements ShouldQueue
     public function __construct(array $newsData)
     {
         $this->newsData = $newsData;
+        $this->newsService = app()->make(NewsService::class);
     }
 
     /**
@@ -30,9 +34,13 @@ class ArticlesSaverJob implements ShouldQueue
      */
     public function handle()
     {
+        echo "saving news\n";
+        echo "news count : ".count($this->newsData)."\n";
         if (!empty($this->newsData)) {
             foreach (array_chunk($this->newsData, 500) as $chunk) {
-                News::insert($chunk);
+                // batch insert items
+                $this->newsService->batchInsert($chunk);
+
             }
         }
     }

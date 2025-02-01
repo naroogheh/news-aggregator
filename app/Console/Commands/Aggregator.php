@@ -46,8 +46,10 @@ class Aggregator extends Command
                 }
                 $class = new $class_name($source, $this->newsAgencyService);
                 $articles = $class->getArticles($params);
-                dd($articles);
+                echo "Articles count : ".count($articles)."\n";
+
                 if (!empty($articles)) {
+                    echo "Dispatching ArticlesSaverJob\n";
                     ArticlesSaverJob::dispatch($articles);
                 }
             }

@@ -2,29 +2,41 @@
 
 namespace App\Repository;
 
-use App\Enum\Status;
-use App\Models\Source;
+use App\Models\News;
 use App\Repository\Interfaces\NewsRepositoryInterface;
-use App\Repository\Interfaces\SourceRepositoryInterface;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class NewsRepository implements NewsRepositoryInterface
 {
 
 
-
     function insertItem($params)
     {
-        Source::create($params);
+        return News::create($params);
+    }
+
+    function batchInsert($items)
+    {
+        try {
+            DB::table('news')->insert($items);
+            return true;
+        } catch (QueryException $e) {
+            // مدیریت خطا
+            Log::error('ERRORR ON NewsRepository batchInsert', ['error' => $e->getMessage()]);
+            return false;
+        }
     }
 
     public function getAll()
     {
-        return Source::where('status', Status::Active->value)->get();
+        return News::all();
     }
 
     public function getById($id)
     {
-        return Source::find($id);
+        return News::find($id);
     }
 
 
