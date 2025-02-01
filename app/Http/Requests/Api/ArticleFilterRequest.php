@@ -25,7 +25,7 @@ class ArticleFilterRequest extends FormRequest
             'date_from' => 'nullable|date', // maybe must be greater than current datetime
             'date_to' => 'nullable|date|gte:date_from',
             'category_id' => 'nullable|integer',
-            'news_agency_id' => 'nullable|integer|exists:news_agency,id',
+            'news_agency_id' => 'nullable|integer|exists:news_agencies,id',
             'source_id' => 'nullable|integer|exists:sources,id',
             'author_id' => 'nullable|integer|exists:authors,id',
             'page' => 'nullable|integer|default:1',

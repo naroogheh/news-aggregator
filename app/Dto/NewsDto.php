@@ -2,6 +2,8 @@
 
 namespace App\Dto;
 
+use Carbon\Carbon;
+
 class NewsDto
 {
     public function __construct(
@@ -14,7 +16,9 @@ class NewsDto
         public int $news_agency_id,
         public int $source_id,
         public int $category_id,
-        public ?int $author_id
+        public ?int $author_id,
+        public string $created_at,
+        public  string $updated_at,
     ) {}
 
     public static function fromArray(array $arr): self
@@ -30,7 +34,9 @@ class NewsDto
             news_agency_id: $arr['news_agency_id'],
             source_id: $arr['source_id'],
             category_id: $arr['category_id'],
-            author_id: $arr['author_id']
+            author_id: $arr['author_id'],
+            created_at: Carbon::now(),
+            updated_at: Carbon::now(),
         );
     }
 
