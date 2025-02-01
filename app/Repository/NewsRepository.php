@@ -48,13 +48,14 @@ class NewsRepository implements NewsRepositoryInterface
         $query = News::query();
         $page = $filters['page'] ?? 1;
         $perPage = $filters['perPage'] ?? 20;
+        $data = json_encode($filters);
         $results = app(Pipeline::class)
             ->send($query)
             ->through([
-                PublishDateFilter::class . ':' . $filters,
-                NewsAgencyFilter::class . ':' . $filters,
-                CategoryFilter::class . ':' . $filters,
-                SourceFilter::class . ':' . $filters,
+                PublishDateFilter::class . ':' . $data,
+                NewsAgencyFilter::class . ':' . $data,
+                CategoryFilter::class . ':' . $data,
+                SourceFilter::class . ':' . $data,
                 // add more filters here
             ])
             ->thenReturn();

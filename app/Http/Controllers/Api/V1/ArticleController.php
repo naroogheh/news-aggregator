@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ArticleFilterRequest;
+use App\Http\Resources\Api\ArticleResource;
 use App\Service\NewsService;
 
 class ArticleController extends Controller
@@ -19,8 +20,10 @@ class ArticleController extends Controller
     {
         $filters = $request->validated();
         $items = $this->newsService->filter($filters);
-        return response()->json(
-            $items
-        );
+        return response()->json([
+            'status'=>true,
+            'data'=>ArticleResource::collection($items),
+            'message'=>'Successfully fetched data',
+        ]);
     }
 }

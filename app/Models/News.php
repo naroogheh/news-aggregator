@@ -10,4 +10,21 @@ class News extends Model
         'created_at',
         'updated_at',
     ];
+
+    function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+    function source()
+        {
+        return $this->belongsTo(Source::class);
+    }
+
+    function news_agency(){
+        return $this->belongsTo(NewsAgency::class);
+    }
+    function author(){
+        return $this->belongsTo(Author::class);
+    }
+
 }
