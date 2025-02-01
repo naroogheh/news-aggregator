@@ -23,10 +23,10 @@ return new class extends Migration
             $table->dateTime('publish_date')->nullable();
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
-            $table->foreignIdFor(NewsAgency::class)->constrained()->onDelete('cascade');
-            $table->foreignIdFor(Source::class)->constrained()->onDelete('cascade');
-            $table->foreignIdFor(Category::class)->constrained()->onDelete('cascade');
-            $table->foreignIdFor(Author::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(NewsAgency::class);
+            $table->foreignIdFor(Source::class);
+            $table->foreignIdFor(Category::class);
+            $table->foreignIdFor(Author::class);
             $table->timestamps();
         });
     }

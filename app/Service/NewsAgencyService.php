@@ -29,5 +29,9 @@ class NewsAgencyService
         return $this->newsAgencyRepository->getById($id);
     }
 
+    public function findBySlug($slug)
+    {
+        return $this->newsAgencyRepository->findBySlug($slug);
+    }
 
 }

@@ -4,6 +4,7 @@ namespace App\Service\Readers;
 
 use App\Contract\NewsReader;
 use App\Dto\NewsDto;
+use App\Helpers\CategoryHelper;
 use App\Models\Source;
 use App\Traits\CurlDataGrabber;
 use Guardian\GuardianAPI;
@@ -67,8 +68,10 @@ class GuardianReader extends BaseReader implements NewsReader
     }
     function grabArticlesFromResponse($articles)
     {
+
         $results = [];
         foreach ($articles as $article) {
+            $category = categoryHelper::getOrCreateCategory($article['sectionId'],$article['sectionName']);
             $arr = [
                 'news_agency_id' => $this->newsAgencyItem->id,
                 'title' => $article->webTitle,
@@ -78,8 +81,8 @@ class GuardianReader extends BaseReader implements NewsReader
                 'description' => $article->fields->bodyText,
                 'image_url' => $article->fields->thumbnail,
                 'source_id' => $this->source->id,
-                'category_id' => $this->source->category_id,
-                'author_id' => $this->source->author_id,
+                'category_id' => $category->id,
+                'author_id' => null,
             ];
             $results[] = NewsDto::fromArray($arr);
         }

@@ -3,16 +3,18 @@
 namespace App\Console\Commands;
 
 use App\Jobs\ArticlesSaverJob;
+use App\Service\NewsAgencyService;
 use App\Service\SourceService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
 class Aggregator extends Command
 {
-    private $sourceService;
-    function __construct( SourceService $sourceService )
+    private $sourceService, $newsAgencyService;
+    function __construct( SourceService $sourceService , NewsAgencyService $newsAgencyService)
     {
         $this->sourceService = $sourceService;
+        $this->newsAgencyService = $newsAgencyService;
         parent::__construct();
     }
     /**
@@ -42,8 +44,9 @@ class Aggregator extends Command
                 if (!class_exists($class_name)) {
                     throw new \Exception("Class {$class_name} does not exist.");
                 }
-                $class = new $class_name($source);
+                $class = new $class_name($source, $this->newsAgencyService);
                 $articles = $class->getArticles($params);
+                dd($articles);
                 if (!empty($articles)) {
                     ArticlesSaverJob::dispatch($articles);
                 }

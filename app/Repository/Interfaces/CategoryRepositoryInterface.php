@@ -7,6 +7,7 @@ interface CategoryRepositoryInterface
     function insertItem($params);
     public function getAll();
     public function getById(int $id);
+    public function findBySlug($slug);
 
 
 }
