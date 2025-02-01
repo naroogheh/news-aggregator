@@ -36,8 +36,15 @@ class ArticlesSaverJob implements ShouldQueue
     {
         echo "saving news\n";
         echo "news count : ".count($this->newsData)."\n";
+
         if (!empty($this->newsData)) {
-            foreach (array_chunk($this->newsData, 500) as $chunk) {
+            $items = $this->newsData;
+            // map to array of news
+            $items = array_map(function ($item) {
+                return $item->toArray();
+            }, $items);
+
+            foreach (array_chunk($items, 500) as $chunk) {
                 // batch insert items
                 $this->newsService->batchInsert($chunk);
 

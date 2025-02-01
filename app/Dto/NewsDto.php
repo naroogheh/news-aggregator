@@ -19,11 +19,12 @@ class NewsDto
 
     public static function fromArray(array $arr): self
     {
+        $publish_date = date('Y-m-d H:i:s', strtotime($arr['publish_date']));
         return new self(
             title: $arr['title'],
             unique_id_on_source: $arr['unique_id_on_source'],
             web_url_on_source: $arr['web_url_on_source'],
-            publish_date: $arr['publish_date'],
+            publish_date: $publish_date,
             description: $arr['description'],
             image_url: $arr['image_url'],
             news_agency_id: $arr['news_agency_id'],
