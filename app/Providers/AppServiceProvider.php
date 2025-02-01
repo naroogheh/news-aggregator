@@ -20,13 +20,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(SourceRepositoryInterface::class, SourceRepository::class);
         $this->app->bind(NewsAgencyRepositoryInterface::class, NewsAgencyRepository::class);
-
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
 
 
-        $this->app->singleton(CategoryHelper::class, function ($app) {
-            CategoryHelper::setCategoryService($app->make(CategoryRepositoryInterface::class));
-            return new CategoryHelper();
+        $this->app->singleton('category-helper', function ($app) {
+            return new CategoryHelper($app->make(CategoryRepositoryInterface::class));
         });
 
     }

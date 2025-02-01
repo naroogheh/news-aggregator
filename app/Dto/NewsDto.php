@@ -14,7 +14,7 @@ class NewsDto
         public int $news_agency_id,
         public int $source_id,
         public int $category_id,
-        public int $author_id
+        public ?int $author_id
     ) {}
 
     public static function fromArray(array $arr): self

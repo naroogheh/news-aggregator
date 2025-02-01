@@ -4,10 +4,10 @@ namespace App\Service\Readers;
 
 use App\Contract\NewsReader;
 use App\Dto\NewsDto;
-use App\Helpers\CategoryHelper;
 use App\Models\Source;
 use App\Traits\CurlDataGrabber;
 use Guardian\GuardianAPI;
+use CategoryHelper;
 
 class GuardianReader extends BaseReader implements NewsReader
 {
@@ -35,16 +35,16 @@ class GuardianReader extends BaseReader implements NewsReader
 
         // check page count
         $pageCount = $response->pages;
-        if($pageCount > 1){
-            //read other pages
-            for ($i = 2; $i <= $pageCount; $i++) {
-                $response = $this->readApiContentPerPage($params,$i);
-                $response = $response->response;
-                // add other page news to results array
-                $articles = $this->grabArticlesFromResponse($response->results);
-                $results = array_merge($results, $articles);
-            }
-        }
+//        if($pageCount > 1){
+//            //read other pages
+//            for ($i = 2; $i <= $pageCount; $i++) {
+//                $response = $this->readApiContentPerPage($params,$i);
+//                $response = $response->response;
+//                // add other page news to results array
+//                $articles = $this->grabArticlesFromResponse($response->results);
+//                $results = array_merge($results, $articles);
+//            }
+//        }
         return $results;
     }
     function readApiContentPerPage($params,$page = 1)
@@ -71,15 +71,15 @@ class GuardianReader extends BaseReader implements NewsReader
 
         $results = [];
         foreach ($articles as $article) {
-            $category = categoryHelper::getOrCreateCategory($article['sectionId'],$article['sectionName']);
+            $category = CategoryHelper::getOrCreateCategory($article->sectionId,$article->sectionName);
             $arr = [
                 'news_agency_id' => $this->newsAgencyItem->id,
                 'title' => $article->webTitle,
                 'unique_id_on_source' => $article->id,
                 'web_url_on_source' => $article->webUrl,
                 'publish_date' => $article->webPublicationDate,
-                'description' => $article->fields->bodyText,
-                'image_url' => $article->fields->thumbnail,
+                'description' => $article->webTitle,
+                'image_url' => '',
                 'source_id' => $this->source->id,
                 'category_id' => $category->id,
                 'author_id' => null,
