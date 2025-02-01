@@ -4,29 +4,37 @@ namespace App\Dto;
 
 class NewsDto
 {
-    public $title;
-    public $unique_id_on_source;
+    public function __construct(
+        public string $title,
+        public string $unique_id_on_source,
+        public string $web_url_on_source,
+        public string $publish_date,
+        public string $description,
+        public string $image_url,
+        public int $news_agency_id,
+        public int $source_id,
+        public int $category_id,
+        public int $author_id
+    ) {}
 
-    public static function fromArry(array $arr)
+    public static function fromArray(array $arr): self
     {
-        $dto = new NewsDto();
-        $dto->title = $arr['title'];
-        $dto->description = $arr['description'];
-        $dto->url = $arr['url'];
-        $dto->urlToImage = $arr['urlToImage'];
-        $dto->publishedAt = $arr['publishedAt'];
-        return $dto;
+        return new self(
+            title: $arr['title'],
+            unique_id_on_source: $arr['unique_id_on_source'],
+            web_url_on_source: $arr['web_url_on_source'],
+            publish_date: $arr['publish_date'],
+            description: $arr['description'],
+            image_url: $arr['image_url'],
+            news_agency_id: $arr['news_agency_id'],
+            source_id: $arr['source_id'],
+            category_id: $arr['category_id'],
+            author_id: $arr['author_id']
+        );
     }
 
-    function toArray()
+    public function toArray(): array
     {
-        return [
-            'title' => $this->title,
-            'description' => $this->description,
-            'url' => $this->url,
-            'urlToImage' => $this->urlToImage,
-            'publishedAt' => $this->publishedAt,
-        ];
+        return (array) $this;
     }
-
 }

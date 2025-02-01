@@ -12,29 +12,41 @@ class GuardianReader extends BaseReader implements NewsReader
 {
     use CurlDataGrabber;
 
-    function __construct(Source $source)
+    private $newsAgencyService;
+    private $newsAgencyItem;
+
+    function __construct(Source $source, $newsAgencyService)
     {
-       parent::__construct($source);
+        $this->newsAgencyService = $newsAgencyService;
+        $this->newsAgencyItem = $newsAgencyService->findBySlug('guardian');
+        parent::__construct($source);
     }
     function getArticles($params = []): array
     {
         $results  = [];
-        $response = $this->readPageContent($params);
+        //read first page of api
+        $response = $this->readApiContentPerPage($params);
         if(!$response)
             return [];
-        $articles = $response->results;
+        // add page 1  news to results array
+        $articles = $this->grabArticlesFromResponse($response->results);
+        $results = array_merge($results, $articles);
+
+        // check page count
         $pageCount = $response->pages;
         if($pageCount > 1){
+            //read other pages
             for ($i = 2; $i <= $pageCount; $i++) {
-                $response = $this->readPageContent($params,$i);
+                $response = $this->readApiContentPerPage($params,$i);
                 $response = $response->response;
-                $articles = $response->results;
+                // add other page news to results array
+                $articles = $this->grabArticlesFromResponse($response->results);
+                $results = array_merge($results, $articles);
             }
         }
-
-        return [];
+        return $results;
     }
-    function readPageContent($params,$page = 1)
+    function readApiContentPerPage($params,$page = 1)
     {
         $token = $this->source->api_token;
         $from = $params['from'];
@@ -58,19 +70,20 @@ class GuardianReader extends BaseReader implements NewsReader
         $results = [];
         foreach ($articles as $article) {
             $arr = [
+                'news_agency_id' => $this->newsAgencyItem->id,
                 'title' => $article->webTitle,
                 'unique_id_on_source' => $article->id,
                 'web_url_on_source' => $article->webUrl,
                 'publish_date' => $article->webPublicationDate,
                 'description' => $article->fields->bodyText,
                 'image_url' => $article->fields->thumbnail,
-                'news_agency_id' => $this->source->news_agency_id,
                 'source_id' => $this->source->id,
                 'category_id' => $this->source->category_id,
                 'author_id' => $this->source->author_id,
             ];
-            $results[] = NewsDto::fromArry($arr);
+            $results[] = NewsDto::fromArray($arr);
         }
+        return $results;
 
     }
 }
