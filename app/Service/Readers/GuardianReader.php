@@ -24,7 +24,6 @@ class GuardianReader extends BaseReader implements NewsReader
             return [];
         $articles = $response->results;
         $pageCount = $response->pages;
-        dd($pageCount);
         if($pageCount > 1){
             for ($i = 2; $i <= $pageCount; $i++) {
                 $response = $this->readPageContent($params,$i);
@@ -32,7 +31,7 @@ class GuardianReader extends BaseReader implements NewsReader
                 $articles = $response->results;
             }
         }
-        dd($pageCount);
+
         return [];
     }
     function readPageContent($params,$page = 1)
@@ -58,7 +57,18 @@ class GuardianReader extends BaseReader implements NewsReader
     {
         $results = [];
         foreach ($articles as $article) {
-            $arr = [];
+            $arr = [
+                'title' => $article->webTitle,
+                'unique_id_on_source' => $article->id,
+                'web_url_on_source' => $article->webUrl,
+                'publish_date' => $article->webPublicationDate,
+                'description' => $article->fields->bodyText,
+                'image_url' => $article->fields->thumbnail,
+                'news_agency_id' => $this->source->news_agency_id,
+                'source_id' => $this->source->id,
+                'category_id' => $this->source->category_id,
+                'author_id' => $this->source->author_id,
+            ];
             $results[] = NewsDto::fromArry($arr);
         }
 

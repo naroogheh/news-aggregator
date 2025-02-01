@@ -24,6 +24,10 @@ class NewsAgencyRepository implements NewsAgencyRepositoryInterface
         return NewsAgency::find($id);
     }
 
+    public function findBySlug(string $slug)
+    {
+        return NewsAgency::where('slug', $slug)->first();
+    }
 
 
 }

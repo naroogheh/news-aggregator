@@ -2,12 +2,11 @@
 
 namespace App\Repository\Interfaces;
 
-interface NewsAgencyRepositoryInterface
+interface CategoryMapRepositoryInterface
 {
     function insertItem($params);
     public function getAll();
     public function getById(int $id);
-    public function findBySlug(string $slug);
 
 
 }

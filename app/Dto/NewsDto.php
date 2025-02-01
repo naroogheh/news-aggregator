@@ -4,6 +4,9 @@ namespace App\Dto;
 
 class NewsDto
 {
+    public $title;
+    public $unique_id_on_source;
+
     public static function fromArry(array $arr)
     {
         $dto = new NewsDto();

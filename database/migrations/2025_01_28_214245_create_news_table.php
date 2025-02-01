@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Author;
+use App\Models\Category;
 use App\Models\NewsAgency;
 use App\Models\Source;
 use Illuminate\Database\Migrations\Migration;
@@ -16,12 +18,15 @@ return new class extends Migration
         Schema::create('news', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
-            $table->foreignIdFor(Source::class);
-            $table->foreignIdFor(NewsAgency::class);
             $table->string('unique_id_on_source')->nullable();
             $table->string('web_url_on_source')->nullable();
-            $table->string('description')->nullable();
-
+            $table->dateTime('publish_date')->nullable();
+            $table->text('description')->nullable();
+            $table->string('image_url')->nullable();
+            $table->foreignIdFor(NewsAgency::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Source::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Category::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Author::class)->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
