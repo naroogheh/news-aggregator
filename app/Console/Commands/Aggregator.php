@@ -47,10 +47,12 @@ class Aggregator extends Command
                 $class = new $class_name($source, $this->newsAgencyService);
                 $articles = $class->getArticles($params);
                 echo "Articles count : ".count($articles)."\n";
-
+                $startDateTime = date('Y-m-d H:i:00');
                 if (!empty($articles)) {
                     echo "Dispatching ArticlesSaverJob\n";
                     ArticlesSaverJob::dispatch($articles);
+                    //update last sync time
+                    $this->sourceService->updateLastSyncTime($source->id, $startDateTime);
                 }
             }
             catch (\Exception $e) {

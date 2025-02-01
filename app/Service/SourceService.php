@@ -33,4 +33,9 @@ class SourceService
         return $this->sourceRepository->changeStatus($id, $status);
     }
 
+    function updateLastSyncTime($id,$time)
+    {
+        return $this->sourceRepository->updateLastSyncTime($id,$time);
+    }
+
 }

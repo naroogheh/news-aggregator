@@ -42,5 +42,14 @@ class SourceRepository implements SourceRepositoryInterface
 
     }
 
+    function updateLastSyncTime($id,$time)
+    {
+        $find = $this->getById($id);
+        if (!$find) return false;
+        $find->last_sync_time = $time;
+        $find->save();
+        return true;
+    }
+
 
 }

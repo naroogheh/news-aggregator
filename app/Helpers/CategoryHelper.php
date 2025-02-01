@@ -12,18 +12,15 @@ class CategoryHelper
 
     public function __construct(CategoryRepositoryInterface $categoryService)
     {
-        if (is_null($categoryService)) {
-            throw new Exception("CategoryRepositoryInterface به درستی تزریق نشده است.");
-        }
         $this->categoryService = $categoryService;
     }
 
-    public function getOrCreateCategory(string $slug, string $name): Category
+    public function getOrCreateCategory(string $slug, string $title): Category
     {
         $category = $this->categoryService->findBySlug($slug);
         if (!$category) {
             $category = $this->categoryService->insertItem([
-                'name' => $name,
+                'title' => $title,
                 'slug' => $slug,
                 'status' => Status::Active->value,
             ]);
