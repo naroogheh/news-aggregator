@@ -46,6 +46,7 @@ class NewsRepository implements NewsRepositoryInterface
     function filter($filters)
     {
         $query = News::query();
+        $query->with(['category', 'newsAgency', 'source']);
         $page = $filters['page'] ?? 1;
         $perPage = $filters['perPage'] ?? 20;
         $data = json_encode($filters);

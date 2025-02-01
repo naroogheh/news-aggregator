@@ -22,7 +22,13 @@ class ArticleController extends Controller
         $items = $this->newsService->filter($filters);
         return response()->json([
             'status'=>true,
-            'data'=>ArticleResource::collection($items),
+            'data'=>[
+                'items'=>ArticleResource::collection($items),
+                'total'=>count($items),
+                'page'=>$filters['page'] ?? 1,
+                'page_size'=>$filters['page_size'] ?? 10,
+                'total_pages'=>ceil(count($items)/($filters['page_size'] ?? 10)),
+            ],
             'message'=>'Successfully fetched data',
         ]);
     }

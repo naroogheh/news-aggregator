@@ -20,7 +20,7 @@ class News extends Model
         return $this->belongsTo(Source::class);
     }
 
-    function news_agency(){
+    function newsAgency(){
         return $this->belongsTo(NewsAgency::class);
     }
     function author(){

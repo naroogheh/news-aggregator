@@ -14,19 +14,25 @@ class ArticleResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $source = $this->source;
-
         return [
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'category' => CategoryResource::make($this->category),
-            'news_agency' =>NewsAgencyResource::make( $this->news_agency),
-            'source' => SourceResource::make($this->source),
-            'author' => AuthorResource::make($this->author),
-            'published_at' => $this->published_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'category' => $this->whenLoaded('category', function () {
+                return $this->category ? new CategoryResource($this->category) : null;
+            }),
+            'news_agency' => $this->whenLoaded('newsAgency', function () {
+                return $this->newsAgency ? new NewsAgencyResource($this->newsAgency) : null;
+            }),
+            'source' => $this->whenLoaded('source', function () {
+                return $this->source ? new SourceResource($this->source) : null;
+            }),
+            'author' => $this->whenLoaded('author', function () {
+                return $this->author ? new AuthorResource($this->author) : null;
+            }),
+            'published_at' => $this->publish_date,
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
