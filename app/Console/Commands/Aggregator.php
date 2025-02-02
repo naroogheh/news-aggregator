@@ -42,7 +42,7 @@ class Aggregator extends Command
 
     private function getCachedSources()
     {
-        return Cache::remember('news_sources', 3600, function () {
+        return Cache::remember('news_sources', 30, function () {
             return $this->sourceService->getAll();
         });
     }
