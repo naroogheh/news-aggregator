@@ -33,18 +33,24 @@ class GuardianReader extends BaseReader implements NewsReader
         $articles = $this->grabArticlesFromResponse($response->results);
         $results = array_merge($results, $articles);
 
-        // check page count
-        $pageCount = $response->pages;
-//        if($pageCount > 1){
-//            //read other pages
-//            for ($i = 2; $i <= $pageCount; $i++) {
-//                $response = $this->readApiContentPerPage($params,$i);
-//                $response = $response->response;
-//                // add other page news to results array
-//                $articles = $this->grabArticlesFromResponse($response->results);
-//                $results = array_merge($results, $articles);
-//            }
-//        }
+        // check environment and run loop to read other pages on production only
+        // in development mode it will read only first page
+        if (env('APP_ENV') == 'production')
+        {
+            $pageCount = $response->pages;
+            if($pageCount > 1){
+                //read other pages
+                for ($i = 2; $i <= $pageCount; $i++) {
+                    $response = $this->readApiContentPerPage($params,$i);
+                    $response = $response->response;
+                    // add other page news to results array
+                    $articles = $this->grabArticlesFromResponse($response->results);
+                    $results = array_merge($results, $articles);
+                }
+            }
+        }
+
+
         return $results;
     }
     function readApiContentPerPage($params,$page = 1)
