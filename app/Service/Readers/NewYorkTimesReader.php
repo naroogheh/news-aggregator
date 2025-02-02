@@ -9,26 +9,32 @@ use App\Traits\CurlDataGrabber;
 use CategoryHelper;
 use AgencyHelper;
 use Illuminate\Support\Facades\Log;
-use jcobhams\NewsApi\NewsApi;
+use Illuminate\Support\Str;
+use AuthorHelper;
 
-class NewsOrgReader extends BaseReader implements NewsReader
+class NewYorkTimesReader extends BaseReader implements NewsReader
 {
     use CurlDataGrabber;
 
     private $newsAgencyService;
-
+    private $newsAgencyItem;
     public function __construct(Source $source, $newsAgencyService)
     {
         $this->newsAgencyService = $newsAgencyService;
+        $this->newsAgencyItem = $newsAgencyService->findBySlug('nytimes');
+        Log::error($this->newsAgencyItem);
+        exit;
         parent::__construct($source);
-
-        // Initialize news agencies from the API
-        $this->initializeNewsAgencies($this->source->api_token);
     }
 
     // Optimized function to get articles from the API
     public function getArticles($params = []): array
     {
+        if(!$this->newsAgencyItem)
+        {
+            Log::error('News Agency not found for New York Times');
+            return [];
+        }
         $results = [];
 
         // Read the first page of the API
@@ -38,11 +44,12 @@ class NewsOrgReader extends BaseReader implements NewsReader
         }
 
         // Append articles from the first page
-        $results = $this->grabArticlesFromResponse($response);
+        $results = $this->grabArticlesFromResponse($response->docs);
 
         // Fetch additional pages only in production environment
         if (env('APP_ENV') === 'production') {
-            $this->fetchAdditionalPages($params, $response->pages, $results);
+            $pageCount = ceil($response->meta->hits / 10);
+            $this->fetchAdditionalPages($params, $pageCount, $results);
         }
 
         return $results;
@@ -63,18 +70,25 @@ class NewsOrgReader extends BaseReader implements NewsReader
     public function readApiContentPerPage($params, $page = 1)
     {
         try {
-            $api = new NewsApi($this->source->api_token);
-            $response = $api->getEverything(
-                '*', null, null, null, $params['from'], $params['to'], 'en', null, 100, $page
-            );
+            $from = date('Ymd',strtotime( $params['from']));
+            $to = date('Ymd',strtotime( $params['to']));
+            $data = [
+                'api-key' => $this->source->api_token,
+                'page' => $page,
+                'pageSize' => 100,
+                'begin_date' => $from,
+                'end_date' => $to,
+            ];
+            $url = $this->source->base_url . '/svc/search/v2/articlesearch.json?'. http_build_query($data);
 
+            $response = $this->sendRequest($url);
+            $response = json_decode($response);
             // Log and return null if the response status is not ok
-            if ($response->status !== 'ok') {
+            if ($response->status !== 'OK') {
                 Log::error('News API response error', ['status' => $response->status]);
                 return null;
             }
-
-            return $response->articles ?? [];
+            return $response->response ?? [];
         } catch (\Exception $e) {
             // Catch and log any exceptions
             Log::error('Error fetching news data from API', [
@@ -83,38 +97,6 @@ class NewsOrgReader extends BaseReader implements NewsReader
                 'file' => $e->getFile()
             ]);
             return null;
-        }
-    }
-
-    // Function to initialize news agencies from the API
-    private function initializeNewsAgencies($token)
-    {
-        try {
-            $agencies = $this->readNewsAgencyItems($token);
-            $this->saveAgencies($agencies);
-        } catch (\Exception $e) {
-            Log::error('Error initializing news agencies', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ]);
-        }
-    }
-
-    // Function to fetch and return news agency items
-    private function readNewsAgencyItems($token)
-    {
-        try {
-            $api = new NewsApi($token);
-            $sources = $api->getSources(null, 'en', null);
-            return $sources->status === 'ok' ? $sources->sources : [];
-        } catch (\Exception $e) {
-            Log::error('Error fetching news agencies', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ]);
-            return [];
         }
     }
 
@@ -131,23 +113,26 @@ class NewsOrgReader extends BaseReader implements NewsReader
     {
         $results = [];
         foreach ($articles as $article) {
-            $agency = AgencyHelper::getOrCreateAgency($article->source->name, $article->source->name, '');
-            if (!$agency || !strlen(trim($agency->category))) {
-                continue; // skip if agency is invalid or category is empty
-            }
 
-            $category = CategoryHelper::getOrCreateCategory($agency->category, $agency->category);
+            // Get or create category for the article
+            $categoryTitle = $article->section_name.' '.$article->subsection_name;
+            $categorySlug = Str::slug($categoryTitle);
+            $category = CategoryHelper::getOrCreateCategory($categoryTitle, $categorySlug);
+
+            // Get or create author for the article
+            $authorName = str_replace('By ','', $article->byline->original);
+            $author = AuthorHelper::getOrCreateAuthor(trim($authorName));
             $arr = [
-                'news_agency_id' => $agency->id,
-                'title' => $article->title,
-                'unique_id_on_source' => $article->url,
-                'web_url_on_source' => $article->url,
-                'publish_date' => $article->publishedAt,
-                'description' => $article->description,
-                'image_url' => $article->urlToImage,
+                'news_agency_id' => $this->newsAgencyItem->id,
+                'title' => $article->abstract,
+                'unique_id_on_source' => $article->_id,
+                'web_url_on_source' => $article->web_url,
+                'publish_date' => $article->pub_date,
+                'description' => $article->lead_paragraph,
+                'image_url' => '',
                 'source_id' => $this->source->id,
                 'category_id' => $category->id,
-                'author_id' => null,
+                'author_id' => $author?->id,
             ];
             $results[] = NewsDto::fromArray($arr); // Add the mapped article to results
         }

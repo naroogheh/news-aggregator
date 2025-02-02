@@ -1,7 +1,7 @@
-<?php
-namespace App\Helpers;
+<?php namespace App\Helpers;
 
 use App\Repository\Interfaces\AuthorRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 class AuthorHelper
 {
@@ -12,17 +12,28 @@ class AuthorHelper
         $this->authorService = $authorService;
     }
 
-    public function getOrCreateAuthor( string $name)
+    public function getOrCreateAuthor(string $name)
     {
-        if(strlen(trim($name)) < 1) {
+        $name = trim($name);
+        if (strlen($name) < 1) {
             return null;
         }
-        $category = $this->authorService->findByName($name);
-        if (!$category) {
-            $category = $this->authorService->insertItem([
-                'name' => $name,
-            ]);
+
+        // Find author by name
+        $author = $this->authorService->findByName($name);
+
+        // If not found, create a new author
+        if (!$author) {
+            try {
+                $author = $this->authorService->insertItem([
+                    'name' => $name,
+                ]);
+            } catch (\Exception $e) {
+                Log::error(' Error on AuthorHelper , getOrCreateAuthor '. $e->getMessage());
+                return null;
+            }
         }
-        return $category;
+
+        return $author;
     }
 }

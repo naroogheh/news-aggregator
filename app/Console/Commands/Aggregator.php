@@ -30,11 +30,9 @@ class Aggregator extends Command
                 $this->info("No sources found to dispatch.");
                 return;
             }
-
             $sources->each(function ($source) {
-                ProcessSourceJob::dispatch($source)->onQueue('sources');
+                dispatch(new ProcessSourceJob($source))->onQueue('sources');
             });
-
             $this->info("Dispatched {$sources->count()} sources to the queue.");
         } catch (\Exception $e) {
             $this->error("An error occurred: {$e->getMessage()}");

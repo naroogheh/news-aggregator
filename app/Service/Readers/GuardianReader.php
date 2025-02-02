@@ -9,6 +9,7 @@ use App\Traits\CurlDataGrabber;
 use Guardian\GuardianAPI;
 use CategoryHelper;
 use AuthorHelper;
+use Illuminate\Support\Facades\Log;
 
 class GuardianReader extends BaseReader implements NewsReader
 {
@@ -17,49 +18,54 @@ class GuardianReader extends BaseReader implements NewsReader
     private $newsAgencyService;
     private $newsAgencyItem;
 
-    function __construct(Source $source, $newsAgencyService)
+    public function __construct(Source $source, $newsAgencyService)
     {
         $this->newsAgencyService = $newsAgencyService;
         $this->newsAgencyItem = $newsAgencyService->findBySlug('guardian');
         parent::__construct($source);
     }
-    function getArticles($params = []): array
+
+    public function getArticles($params = []): array
     {
-        $results  = [];
-        //read first page of api
+        $results = [];
+
+        // Read first page of the API
         $response = $this->readApiContentPerPage($params);
-        if(!$response)
+        if (!$response) {
             return [];
-        // add page 1  news to results array
+        }
+
+        // Add first page articles to results
         $articles = $this->grabArticlesFromResponse($response->results);
         $results = array_merge($results, $articles);
 
-        // check environment and run loop to read other pages on production only
-        // in development mode it will read only first page
-        if (env('APP_ENV') == 'production')
-        {
-            $pageCount = $response->pages;
-            if($pageCount > 1){
-                //read other pages
-                for ($i = 2; $i <= $pageCount; $i++) {
-                    $response = $this->readApiContentPerPage($params,$i);
-                    $response = $response->response;
-                    // add other page news to results array
-                    $articles = $this->grabArticlesFromResponse($response->results);
-                    $results = array_merge($results, $articles);
-                }
-            }
+        // Check the environment and read additional pages only in production
+        if (env('APP_ENV') === 'production' && $response->pages > 1) {
+            $this->readAdditionalPages($params, $response->pages, $results);
         }
-
 
         return $results;
     }
-    function readApiContentPerPage($params,$page = 1)
+
+    // Reads additional pages if there are more than one page in the response
+    private function readAdditionalPages($params, $pageCount, &$results)
+    {
+        for ($i = 2; $i <= $pageCount; $i++) {
+            $response = $this->readApiContentPerPage($params, $i);
+            if ($response) {
+                $articles = $this->grabArticlesFromResponse($response->results);
+                $results = array_merge($results, $articles);
+            }
+        }
+    }
+
+    public function readApiContentPerPage($params, $page = 1)
     {
         $token = $this->source->api_token;
         $from = $params['from'];
         $to = $params['to'];
         $api = new GuardianAPI($token);
+
         $response = $api->content()
             ->setPageSize(200)
             ->setPage($page)
@@ -67,19 +73,27 @@ class GuardianReader extends BaseReader implements NewsReader
             ->setToDate(new \DateTimeImmutable($to))
             ->setOrderBy("relevance")
             ->fetch();
-        if($response->response->status !== 'ok') {
-            //add log
+
+        // Check for successful response from API
+        if ($response->response->status !== 'ok') {
+            // Log error if response status is not 'ok'
+            Log::error("Guardian API error: " . $response->response->status);
             return null;
         }
         return $response->response;
     }
-    function grabArticlesFromResponse($articles)
-    {
 
+    public function grabArticlesFromResponse($articles)
+    {
         $results = [];
         foreach ($articles as $article) {
-            $category = CategoryHelper::getOrCreateCategory($article->sectionId,$article->sectionName);
+            // Get or create category for the article
+            $category = CategoryHelper::getOrCreateCategory($article->sectionId, $article->sectionName);
+
+            // Get or create author for the article
             $author = AuthorHelper::getOrCreateAuthor($article->author);
+
+            // Map article data to NewsDto
             $arr = [
                 'news_agency_id' => $this->newsAgencyItem->id,
                 'title' => $article->webTitle,
@@ -90,11 +104,11 @@ class GuardianReader extends BaseReader implements NewsReader
                 'image_url' => '',
                 'source_id' => $this->source->id,
                 'category_id' => $category->id,
-                'author_id' => $author?$author->id:null,
+                'author_id' => $author ? $author->id : null,
             ];
+            // Add the mapped data to results
             $results[] = NewsDto::fromArray($arr);
         }
         return $results;
-
     }
 }

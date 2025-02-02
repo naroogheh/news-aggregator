@@ -42,8 +42,8 @@ class ProcessSourceJob implements ShouldQueue
             ]);
 
             $articles = $reader->getArticles($params);
-
-            if ($articles->isNotEmpty()) {
+            Log::info("Fetched {$this->source->name} articles: " . count($articles));
+            if (count($articles)) {
                 ArticlesSaverJob::dispatch($articles)->onQueue('articles');
                 $this->sourceService->updateLastSyncTime($this->source->id, now()->format('Y-m-d H:i:00'));
             }
