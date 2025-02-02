@@ -16,17 +16,16 @@ class ProcessSourceJob implements ShouldQueue
 
     private $source;
     private $sourceService;
-    private $newsAgencyService;
 
     public function __construct($source)
     {
         $this->source = $source;
     }
 
-    public function handle(SourceService $sourceService, NewsAgencyService $newsAgencyService)
+    public function handle(SourceService $sourceService)
     {
         $this->sourceService = $sourceService;
-        $this->newsAgencyService = $newsAgencyService;
+
 
         try {
             $params = $this->getParams($this->source);
@@ -38,7 +37,6 @@ class ProcessSourceJob implements ShouldQueue
 
             $reader = app($readerClass, [
                 'source' => $this->source,
-                'newsAgencyService' => $this->newsAgencyService,
             ]);
 
             $articles = $reader->getArticles($params);

@@ -4,10 +4,10 @@ namespace App\Service\Readers;
 
 use App\Contract\NewsReader;
 use App\Dto\NewsDto;
+use AgencyHelper;
 use App\Models\Source;
 use App\Traits\CurlDataGrabber;
 use CategoryHelper;
-use AgencyHelper;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use AuthorHelper;
@@ -16,22 +16,20 @@ class NewYorkTimesReader extends BaseReader implements NewsReader
 {
     use CurlDataGrabber;
 
-    private $newsAgencyService;
     private $newsAgencyItem;
-    public function __construct(Source $source, $newsAgencyService)
+    public function __construct(Source $source)
     {
-        $this->newsAgencyService = $newsAgencyService;
-        $this->newsAgencyItem = $newsAgencyService->findBySlug('nytimes');
-        Log::error($this->newsAgencyItem);
-        exit;
         parent::__construct($source);
     }
 
     // Optimized function to get articles from the API
     public function getArticles($params = []): array
     {
+        $this->newsAgencyItem = AgencyHelper::findBySlug('nytimes');
+
         if(!$this->newsAgencyItem)
         {
+            echo "News Agency not found for New York Times";
             Log::error('News Agency not found for New York Times');
             return [];
         }
@@ -113,11 +111,13 @@ class NewYorkTimesReader extends BaseReader implements NewsReader
     {
         $results = [];
         foreach ($articles as $article) {
-
             // Get or create category for the article
-            $categoryTitle = $article->section_name.' '.$article->subsection_name;
+            $categoryTitle = ($article->section_name??'').' '.($article->subsection_name??'');
             $categorySlug = Str::slug($categoryTitle);
-            $category = CategoryHelper::getOrCreateCategory($categoryTitle, $categorySlug);
+            if(strlen(trim($categorySlug)))
+                $category = CategoryHelper::getOrCreateCategory($categoryTitle, $categorySlug);
+            else
+                $category = null;
 
             // Get or create author for the article
             $authorName = str_replace('By ','', $article->byline->original);
@@ -131,7 +131,7 @@ class NewYorkTimesReader extends BaseReader implements NewsReader
                 'description' => $article->lead_paragraph,
                 'image_url' => '',
                 'source_id' => $this->source->id,
-                'category_id' => $category->id,
+                'category_id' =>$category? $category->id:null,
                 'author_id' => $author?->id,
             ];
             $results[] = NewsDto::fromArray($arr); // Add the mapped article to results

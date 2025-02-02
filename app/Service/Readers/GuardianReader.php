@@ -9,24 +9,23 @@ use App\Traits\CurlDataGrabber;
 use Guardian\GuardianAPI;
 use CategoryHelper;
 use AuthorHelper;
+use AgencyHelper;
 use Illuminate\Support\Facades\Log;
 
 class GuardianReader extends BaseReader implements NewsReader
 {
     use CurlDataGrabber;
 
-    private $newsAgencyService;
     private $newsAgencyItem;
 
-    public function __construct(Source $source, $newsAgencyService)
+    public function __construct(Source $source)
     {
-        $this->newsAgencyService = $newsAgencyService;
-        $this->newsAgencyItem = $newsAgencyService->findBySlug('guardian');
         parent::__construct($source);
     }
 
     public function getArticles($params = []): array
     {
+        $this->newsAgencyItem = AgencyHelper::findBySlug('nytimes');
         $results = [];
 
         // Read first page of the API

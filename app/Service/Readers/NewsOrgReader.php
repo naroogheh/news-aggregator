@@ -15,11 +15,9 @@ class NewsOrgReader extends BaseReader implements NewsReader
 {
     use CurlDataGrabber;
 
-    private $newsAgencyService;
 
-    public function __construct(Source $source, $newsAgencyService)
+    public function __construct(Source $source)
     {
-        $this->newsAgencyService = $newsAgencyService;
         parent::__construct($source);
 
         // Initialize news agencies from the API

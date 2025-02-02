@@ -26,5 +26,13 @@ class NewsAgency extends Seeder
             'updated_at' => now(),
         ];
         $this->newsAgencyService->insertItem($params);
+        $params = [
+            'title' => 'nytimes',
+            'slug' => 'nytimes',
+            'category' => 'general',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        $this->newsAgencyService->insertItem($params);
     }
 }

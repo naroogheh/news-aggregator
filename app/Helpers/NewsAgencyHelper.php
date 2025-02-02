@@ -29,4 +29,9 @@ class NewsAgencyHelper
         }
         return $agency;
     }
+    public static function findBySlug(string $slug): ?NewsAgency
+    {
+        return NewsAgency::where('slug', $slug)->first();
+    }
+
 }
