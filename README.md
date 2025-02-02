@@ -21,17 +21,19 @@ cp .env.example .env
 
 docker-compose up -d
 
-docker-compose exec app php artisan key:generate
+# run these commands on php container (in docker container)
+  
+php artisan key:generate
 
-docker-compose exec app php artisan migrate
+php artisan migrate
 
-docker-compose exec app php artisan db:seed
+php artisan db:seed
 
-docker-compose exec app php artisan queue:work --queue=sources,articles
+php artisan queue:work --queue=sources,articles
 
 #Run this command to run the aggregator manually:
 
-docker-compose exec app php artisan aggregator:run
+php artisan aggregator:run
 
 ```
 ## Usage
