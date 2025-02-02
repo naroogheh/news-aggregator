@@ -29,6 +29,10 @@ docker-compose exec app php artisan db:seed
 
 docker-compose exec app php artisan queue:work --queue=sources,articles
 
+#Run this command to run the aggregator manually:
+
+docker-compose exec app php artisan aggregator:run
+
 ```
 ## Usage
 
