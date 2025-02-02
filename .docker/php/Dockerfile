@@ -1,42 +1,38 @@
 FROM php:8.3-fpm
 
+# نصب وابستگی‌ها
 COPY php.ini /usr/local/etc/php/
 COPY docker.conf /usr/local/etc/php-fpm.d/docker.conf
 COPY .bashrc /root/
 
-# mix
+# نصب بسته‌های مورد نیاز برای mix
 RUN apt-get update \
   && apt-get install -y build-essential zlib1g-dev default-mysql-client curl gnupg procps vim git unzip libzip-dev libpq-dev \
   && docker-php-ext-install zip pdo_mysql pdo_pgsql pgsql
 
-# intl
+# نصب Intl extension
 RUN apt-get install -y libicu-dev \
   && docker-php-ext-configure intl \
   && docker-php-ext-install intl
 
-# gd
+# نصب GD extension
 RUN apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev && \
 docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ && \
 docker-php-ext-install gd
 
-# redis
+# نصب Redis extension
 RUN pecl install redis && docker-php-ext-enable redis
 
-# pcov
+# نصب PCOV extension
 RUN pecl install pcov && docker-php-ext-enable pcov
 
-# Xdebug
-# RUN pecl install xdebug \
-# && docker-php-ext-enable xdebug \
-# && echo ";zend_extension=xdebug" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-
-# Node.js, NPM, Yarn
+# نصب Node.js, NPM و Yarn
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs
 RUN npm install npm@latest -g
 RUN npm install yarn -g
 
-# Composer
+#  Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
@@ -48,8 +44,18 @@ ENV PATH $PATH:/composer/vendor/bin
 RUN composer config --global process-timeout 3600
 RUN composer global require "laravel/installer"
 
-WORKDIR /root
-RUN git clone https://github.com/seebi/dircolors-solarized
+# نصب کرون
+RUN apt-get install -y cron
 
-EXPOSE 5173
+# کپی کردن اسکریپت start.sh
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
+# تنظیم دستور پیش‌فرض برای اجرا
+CMD ["start.sh"]
+
+# تنظیم محیط کاری
 WORKDIR /var/www
+
+# پورت‌ها
+EXPOSE 5173
