@@ -4,8 +4,8 @@ namespace App\Service\Readers;
 
 use App\Contract\NewsReader;
 use App\Dto\NewsDto;
+use App\Enum\SourceSlugEnum;
 use App\Models\Source;
-use App\Traits\CurlDataGrabber;
 use Guardian\GuardianAPI;
 use CategoryHelper;
 use AuthorHelper;
@@ -14,8 +14,6 @@ use Illuminate\Support\Facades\Log;
 
 class GuardianReader extends BaseReader implements NewsReader
 {
-    use CurlDataGrabber;
-
     private $newsAgencyItem;
 
     public function __construct(Source $source)
@@ -25,7 +23,7 @@ class GuardianReader extends BaseReader implements NewsReader
 
     public function getArticles($params = []): array
     {
-        $this->newsAgencyItem = AgencyHelper::findBySlug('nytimes');
+        $this->newsAgencyItem = AgencyHelper::findBySlug(SourceSlugEnum::SLUG_GUARDIAN->value);
         $results = [];
 
         // Read first page of the API

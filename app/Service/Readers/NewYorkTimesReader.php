@@ -5,6 +5,7 @@ namespace App\Service\Readers;
 use App\Contract\NewsReader;
 use App\Dto\NewsDto;
 use AgencyHelper;
+use App\Enum\SourceSlugEnum;
 use App\Models\Source;
 use App\Traits\CurlDataGrabber;
 use CategoryHelper;
@@ -25,7 +26,7 @@ class NewYorkTimesReader extends BaseReader implements NewsReader
     // Optimized function to get articles from the API
     public function getArticles($params = []): array
     {
-        $this->newsAgencyItem = AgencyHelper::findBySlug('nytimes');
+        $this->newsAgencyItem = AgencyHelper::findBySlug(SourceSlugEnum::SLUG_NY_TIMES->value);
 
         if(!$this->newsAgencyItem)
         {

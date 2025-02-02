@@ -5,7 +5,6 @@ namespace App\Service\Readers;
 use App\Contract\NewsReader;
 use App\Dto\NewsDto;
 use App\Models\Source;
-use App\Traits\CurlDataGrabber;
 use CategoryHelper;
 use AgencyHelper;
 use Illuminate\Support\Facades\Log;
@@ -13,8 +12,6 @@ use jcobhams\NewsApi\NewsApi;
 
 class NewsOrgReader extends BaseReader implements NewsReader
 {
-    use CurlDataGrabber;
-
 
     public function __construct(Source $source)
     {
