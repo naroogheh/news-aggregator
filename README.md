@@ -19,13 +19,27 @@ cd news-aggregator
 
 cp .env.example .env
 
-cp .env.example .env
-
 docker-compose up -d
-
-docker-compose exec app composer install
 
 docker-compose exec app php artisan key:generate
 
 docker-compose exec app php artisan migrate
+
+docker-compose exec app php artisan db:seed
+
+docker-compose exec app php artisan queue:work --queue=sources,articles
+
+```
+## Usage
+
+Open the application in your web browser at http://localhost:2080.
+
+Api documentation (Swagger Ui ) is available at http://localhost:2080/api/documentation
+
+because of api token limit ,in development mode, only first page of Sources will be read and stored in database.
+
+## Contributing
+
+ - it is better to use Elasticsearch for search and indexing.
+ - use redis for caching. and queue. redis container is already in docker-compose.yml file.
 
