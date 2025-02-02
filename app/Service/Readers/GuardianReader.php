@@ -8,6 +8,7 @@ use App\Models\Source;
 use App\Traits\CurlDataGrabber;
 use Guardian\GuardianAPI;
 use CategoryHelper;
+use AuthorHelper;
 
 class GuardianReader extends BaseReader implements NewsReader
 {
@@ -78,6 +79,7 @@ class GuardianReader extends BaseReader implements NewsReader
         $results = [];
         foreach ($articles as $article) {
             $category = CategoryHelper::getOrCreateCategory($article->sectionId,$article->sectionName);
+            $author = AuthorHelper::getOrCreateAuthor($article->author);
             $arr = [
                 'news_agency_id' => $this->newsAgencyItem->id,
                 'title' => $article->webTitle,
@@ -88,7 +90,7 @@ class GuardianReader extends BaseReader implements NewsReader
                 'image_url' => '',
                 'source_id' => $this->source->id,
                 'category_id' => $category->id,
-                'author_id' => null,
+                'author_id' => $author?$author->id:null,
             ];
             $results[] = NewsDto::fromArray($arr);
         }
