@@ -1,0 +1,164 @@
+openapi: 3.0.0
+info:
+  title: News Aggregator API
+  description: API for News Aggregation
+  version: 1.0.0
+
+servers:
+  - url: 'http://localhost:2080/api/v1'
+
+tags:
+  - name: News
+    description: Operations related to news articles
+  - name: Data
+    description: Operations related to categories, authors, sources, and news agencies
+
+paths:
+  /articles:
+    get:
+      summary: Get a list of articles
+      tags:
+        - News
+      parameters:
+        - name: category_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: news_agency_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: source_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: author_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: A list of articles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string
+                        content:
+                          type: string
+
+  /categories:
+    get:
+      summary: Get a list of categories
+      tags:
+        - Data
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+
+  /authors:
+    get:
+      summary: Get a list of authors
+      tags:
+        - Data
+      responses:
+        '200':
+          description: A list of authors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+
+  /sources:
+    get:
+      summary: Get a list of sources
+      tags:
+        - Data
+      responses:
+        '200':
+          description: A list of sources
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+
+  /news-agencies:
+    get:
+      summary: Get a list of news agencies
+      tags:
+        - Data
+      responses:
+        '200':
+          description: A list of news agencies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string

@@ -28,8 +28,8 @@ class ArticleFilterRequest extends FormRequest
             'news_agency_id' => 'nullable|integer|exists:news_agencies,id',
             'source_id' => 'nullable|integer|exists:sources,id',
             'author_id' => 'nullable|integer|exists:authors,id',
-            'page' => 'nullable|integer|default:1',
-            'per_page' => 'nullable|integer|default:20|max:200|min:1',
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|max:200|min:1',
         ];
     }
 }

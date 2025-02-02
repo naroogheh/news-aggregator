@@ -48,7 +48,7 @@ class NewsRepository implements NewsRepositoryInterface
         $query = News::query();
         $query->with(['category', 'newsAgency', 'source']);
         $page = $filters['page'] ?? 1;
-        $perPage = $filters['perPage'] ?? 20;
+        $perPage = $filters['per_page'] ?? 20;
         $data = json_encode($filters);
         $results = app(Pipeline::class)
             ->send($query)
