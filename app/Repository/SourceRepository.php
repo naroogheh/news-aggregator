@@ -13,13 +13,17 @@ class SourceRepository implements SourceRepositoryInterface
 
     function insertItem($params)
     {
-        Source::create($params);
+        $slug = $params['slug'];
+        $find = $this->findBySlug($slug);
+        if ($find) return false;
+        return Source::create($params);
     }
 
     public function getAll()
     {
         return Source::where('status', Status::Active->value)->get();
     }
+
 
     public function getById($id)
     {
@@ -49,6 +53,11 @@ class SourceRepository implements SourceRepositoryInterface
         $find->last_sync_time = $time;
         $find->save();
         return true;
+    }
+
+    private function findBySlug($slug)
+    {
+        return Source::where('slug', $slug)->first();
     }
 
 

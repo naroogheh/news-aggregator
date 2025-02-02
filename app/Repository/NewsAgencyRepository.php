@@ -11,7 +11,10 @@ class NewsAgencyRepository implements NewsAgencyRepositoryInterface
 
     function insertItem($params)
     {
-        NewsAgency::create($params);
+        $slug = $params['slug'];
+        $find = $this->findBySlug($slug);
+        if ($find) return false;
+        return NewsAgency::create($params);
     }
 
     public function getAll()

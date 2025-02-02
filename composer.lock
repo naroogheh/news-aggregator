@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b08614e63d1557f55377b8f3b51130b0",
+    "content-hash": "3a281b84a7f9217a14c9a0df52c250f5",
     "packages": [
         {
             "name": "brick/math",
@@ -1053,6 +1053,53 @@
                 }
             ],
             "time": "2023-12-03T19:50:20+00:00"
+        },
+        {
+            "name": "jcobhams/newsapi",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jcobhams/newsapi-php.git",
+                "reference": "5961d7e1b1493fe7493d278bada2dba1f5481471"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jcobhams/newsapi-php/zipball/5961d7e1b1493fe7493d278bada2dba1f5481471",
+                "reference": "5961d7e1b1493fe7493d278bada2dba1f5481471",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "6 - 7",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "6 - 9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "jcobhams\\NewsApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joseph Cobhams",
+                    "email": "jcobhams@gmail.com"
+                }
+            ],
+            "description": "A PHP client for NewsApi",
+            "keywords": [
+                "newsapi"
+            ],
+            "support": {
+                "issues": "https://github.com/jcobhams/newsapi-php/issues",
+                "source": "https://github.com/jcobhams/newsapi-php/tree/v1.0.1"
+            },
+            "time": "2023-02-19T16:24:49+00:00"
         },
         {
             "name": "laravel/framework",

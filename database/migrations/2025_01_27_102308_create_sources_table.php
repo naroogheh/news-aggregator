@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('sources', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
+            $table->string('slug')->nullable();
             $table->string('base_url')->nullable();
             $table->string('reader_class')->nullable();
             $table->string('api_token')->nullable();
