@@ -4,7 +4,6 @@ namespace App\Helpers;
 use App\Enum\Status;
 use App\Models\Category;
 use App\Repository\Interfaces\CategoryRepositoryInterface;
-use Exception;
 
 class CategoryHelper
 {

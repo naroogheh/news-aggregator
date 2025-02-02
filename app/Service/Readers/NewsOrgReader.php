@@ -22,16 +22,21 @@ class NewsOrgReader extends BaseReader implements NewsReader
     {
         $this->newsAgencyService = $newsAgencyService;
         parent::__construct($source);
+        $token = $this->source->api_token;
+        $agencies = $this->readNewsAgencyItems($token);
+        $this->saveAgencies($agencies);
     }
     function getArticles($params = []): array
     {
+
+
         $results  = [];
         //read first page of api
         $response = $this->readApiContentPerPage($params);
         if(!$response)
             return [];
         // add page 1  news to results array
-        $articles = $this->grabArticlesFromResponse($response->results);
+        $articles = $this->grabArticlesFromResponse($response);
         $results = array_merge($results, $articles);
 
         // check environment and run loop to read other pages on production only
@@ -58,22 +63,18 @@ class NewsOrgReader extends BaseReader implements NewsReader
     {
         try {
             $token = $this->source->api_token;
-            $agencies = $this->readNewsAgencyItems($token);
-            $this->saveAgencies($agencies);
-            var_dump($agencies);
-            exit;
             $from = $params['from'];
             $to = $params['to'];
             $api = new NewsApi($token);
             $response = $api->getEverything(
                 '*',
-                '',
-                '',
-                '',
+                null,
+                null,
+                null,
                 $from,
                 $to,
                 'en',
-                'publishedAt',  100,
+                null,  100,
                 $page);
             if($response->status !== 'ok') {
                 //add log
@@ -115,19 +116,20 @@ class NewsOrgReader extends BaseReader implements NewsReader
     }
     function grabArticlesFromResponse($articles)
     {
-
         $results = [];
         foreach ($articles as $article) {
-            $agency = AgencyHelper::getOrCreateCategory($article->name,$article->name);
-            $category = CategoryHelper::readFromAgency($article->sectionId,$article->sectionName);
+            $agency = AgencyHelper::getOrCreateAgency($article->source->name,$article->source->name,'');
+            if(!$agency || !strlen(trim($agency->category)))
+                continue;
+            $category = CategoryHelper::getOrCreateCategory($agency->category,$agency->category);
             $arr = [
-                'news_agency_id' => $this->newsAgencyItem->id,
-                'title' => $article->webTitle,
-                'unique_id_on_source' => $article->id,
-                'web_url_on_source' => $article->webUrl,
-                'publish_date' => $article->webPublicationDate,
-                'description' => $article->webTitle,
-                'image_url' => '',
+                'news_agency_id' => $agency->id,
+                'title' => $article->title,
+                'unique_id_on_source' => $article->url,
+                'web_url_on_source' => $article->url,
+                'publish_date' => $article->publishedAt,
+                'description' => $article->description,
+                'image_url' => $article->urlToImage,
                 'source_id' => $this->source->id,
                 'category_id' => $category->id,
                 'author_id' => null,
