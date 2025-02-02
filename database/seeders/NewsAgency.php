@@ -21,6 +21,7 @@ class NewsAgency extends Seeder
         $params = [
             'title' => 'guardian',
             'slug' => 'guardian',
+            'category' => 'general',
             'created_at' => now(),
             'updated_at' => now(),
         ];

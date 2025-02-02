@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Helpers\CategoryHelper;
+use App\Helpers\NewsAgencyHelper;
 use App\Repository\CategoryRepository;
 use App\Repository\Interfaces\CategoryRepositoryInterface;
 use App\Repository\Interfaces\NewsAgencyRepositoryInterface;
@@ -25,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('category-helper', function ($app) {
             return new CategoryHelper($app->make(CategoryRepositoryInterface::class));
+        });
+        $this->app->singleton('agency-helper', function ($app) {
+            return new NewsAgencyHelper($app->make(NewsAgencyRepositoryInterface::class));
         });
 
     }

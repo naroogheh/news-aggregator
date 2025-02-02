@@ -82,6 +82,7 @@ class NewsOrgReader extends BaseReader implements NewsReader
             return $response->articles;
         }
         catch (\Exception $e) {
+            var_dump($e->getMessage().' , '.$e->getLine().' , '.$e->getFile());
             //add log
             Log::log('error', $e->getMessage());
             return null;
@@ -109,7 +110,7 @@ class NewsOrgReader extends BaseReader implements NewsReader
     function saveAgencies($agencies)
     {
         foreach ($agencies as $agency) {
-            $agency = AgencyHelper::getOrCreateCategory($agency->id,$agency->name,$agency->category);
+            $agency = AgencyHelper::getOrCreateAgency($agency->id,$agency->name,$agency->category);
         }
     }
     function grabArticlesFromResponse($articles)

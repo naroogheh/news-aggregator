@@ -3,6 +3,7 @@ namespace App\Helpers;
 
 use App\Enum\Status;
 use App\Models\Category;
+use App\Models\NewsAgency;
 use App\Repository\Interfaces\CategoryRepositoryInterface;
 use App\Repository\Interfaces\NewsAgencyRepositoryInterface;
 use Exception;
@@ -16,10 +17,10 @@ class NewsAgencyHelper
         $this->newsAgencyService = $newsAgencyService;
     }
 
-    public function getOrCreateAgency(string $slug, string $title, string $category): Category
+    public function getOrCreateAgency(string $slug, string $title, string $category): NewsAgency
     {
         $agency = $this->newsAgencyService->findBySlug($slug);
-        if (!$category) {
+        if (!$agency) {
             $agency = $this->newsAgencyService->insertItem([
                 'title' => $title,
                 'slug' => $slug,
