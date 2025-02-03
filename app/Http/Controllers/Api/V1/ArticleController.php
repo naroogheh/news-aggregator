@@ -20,16 +20,22 @@ class ArticleController extends Controller
     {
         $filters = $request->validated();
         $items = $this->newsService->filter($filters);
+    
+        $totalItems = count($items);
+        $page = $filters['page'] ?? 1;
+        $pageSize = $filters['page_size'] ?? 10;
+        $totalPages = ceil($totalItems / $pageSize);
+    
         return response()->json([
-            'status'=>true,
-            'data'=>[
-                'items'=>ArticleResource::collection($items),
-                'total'=>count($items),
-                'page'=>$filters['page'] ?? 1,
-                'page_size'=>$filters['page_size'] ?? 10,
-                'total_pages'=>ceil(count($items)/($filters['page_size'] ?? 10)),
+            'status' => true,
+            'data' => [
+                'items' => ArticleResource::collection($items),
+                'total' => $totalItems,
+                'page' => $page,
+                'page_size' => $pageSize,
+                'total_pages' => $totalPages,
             ],
-            'message'=>'Successfully fetched data',
+            'message' => 'Successfully fetched data',
         ]);
     }
 }
