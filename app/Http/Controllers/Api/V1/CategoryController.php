@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enum\CacheKeys;
 use App\Http\Resources\Api\CategoryResource;
 use App\Repository\Interfaces\CategoryRepositoryInterface;
 
@@ -16,14 +17,14 @@ class CategoryController
     public function index()
     {
         // check cache
-        $cache_is_exist = cache()->has('categories');
+        $cache_is_exist = cache()->has(CacheKeys::KEY_CATEGOORIES->value);
         if ($cache_is_exist) {
-            $categories = cache()->get('categories');
+            $categories = cache()->get(CacheKeys::KEY_CATEGOORIES->value);
         }
         else {
             $categories = $this->categoryRepository->getAll();
             // update cache
-            cache()->put('categories', $categories, 60 * 60 * 24);
+            cache()->put(CacheKeys::KEY_CATEGOORIES->value, $categories, 60 * 60 * 24);
         }
         return response()->json([
             'success' => true,

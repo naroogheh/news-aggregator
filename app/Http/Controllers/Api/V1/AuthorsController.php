@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enum\CacheKeys;
 use App\Http\Resources\Api\AuthorResource;
 use App\Repository\AuthorRepository;
 
@@ -16,14 +17,14 @@ class AuthorsController
     public function index()
     {
         // check cache
-        $cache_is_exist = cache()->has('authors');
+        $cache_is_exist = cache()->has(CacheKeys::KEY_AUTHORS->value);
         if ($cache_is_exist) {
-            $authors = cache()->get('authors');
+            $authors = cache()->get(CacheKeys::KEY_AUTHORS->value);
         }
         else {
             $authors = $this->authorRepository->getAll();
             // update cache
-            cache()->put('authors', $authors, 60 * 60 * 24);
+            cache()->put(CacheKeys::KEY_AUTHORS->value, $authors, 60 * 60 * 24);
         }
         return response()->json([
             'success' => true,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enum\CacheKeys;
 use App\Http\Resources\Api\SourceResource;
 use App\Repository\Interfaces\SourceRepositoryInterface;
 
@@ -16,14 +17,14 @@ class SourceController
     public function index()
     {
         // check cache
-        $cache_is_exist = cache()->has('sources');
+        $cache_is_exist = cache()->has(CacheKeys::KEY_SOURCES->value);
         if ($cache_is_exist) {
-            $sources = cache()->get('sources');
+            $sources = cache()->get(CacheKeys::KEY_SOURCES->value);
         }
         else {
             $sources = $this->sourceRepository->getAll();
             // update cache
-            cache()->put('sources', $sources, 60 * 60 * 24);
+            cache()->put(CacheKeys::KEY_SOURCES->value, $sources, 60 * 60 * 24);
         }
         return response()->json([
             'success' => true,

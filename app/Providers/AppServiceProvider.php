@@ -5,6 +5,14 @@ namespace App\Providers;
 use App\Helpers\AuthorHelper;
 use App\Helpers\CategoryHelper;
 use App\Helpers\NewsAgencyHelper;
+use App\Models\Author;
+use App\Models\Category;
+use App\Models\NewsAgency;
+use App\Models\Source;
+use App\Observers\AuthorObserver;
+use App\Observers\CategoryObserver;
+use App\Observers\NewsAgencyObserver;
+use App\Observers\SourceObserver;
 use App\Repository\AuthorRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\Interfaces\AuthorRepositoryInterface;
@@ -22,6 +30,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        //register observables
+        Source::observe(SourceObserver::class);
+        Category::observe(CategoryObserver::class);
+        NewsAgency::observe(NewsAgencyObserver::class);
+        Author::observe(AuthorObserver::class);
+
+
         $this->app->bind(SourceRepositoryInterface::class, SourceRepository::class);
         $this->app->bind(NewsAgencyRepositoryInterface::class, NewsAgencyRepository::class);
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
